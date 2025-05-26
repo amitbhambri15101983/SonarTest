@@ -1,0 +1,34 @@
+pipeline {
+    agent any
+
+    tools {
+        maven 'Maven 3' // Configure this in Global Tool Config
+        jdk 'Java 11'   // Configure this in Global Tool Config
+    }
+
+    environment {
+        SONAR_SCANNER_HOME = tool 'SonarScanner'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/your/repo.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'mvn clean install'
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('LocalSonar') {
+                    sh "${SONAR_SCANNER_HOME}/bin/sonar-scanner"
+                }
+            }
+        }
+    }
+}
